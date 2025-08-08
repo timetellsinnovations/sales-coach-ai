@@ -1,4 +1,4 @@
-// Sales Coach AI - Main Application JavaScript (FIXED VERSION)
+// Sales Coach AI - Main Application JavaScript (CRITICAL FIXES)
 
 class SalesCoachApp {
     constructor() {
@@ -8,6 +8,7 @@ class SalesCoachApp {
         this.isRecording = false;
         this.sessionTimer = null;
         this.sessionStartTime = null;
+        this.isSkipMode = false;
         
         // Initialize app data
         this.frameworks = [
@@ -162,12 +163,23 @@ class SalesCoachApp {
         this.showScreen('frameworks');
         this.renderFrameworks();
         this.setActiveNavigation('frameworks');
+        
+        // Set up default user if in skip mode
+        if (this.isSkipMode && !this.currentUser) {
+            this.currentUser = {
+                id: 'demo-user',
+                name: 'Demo User',
+                email: 'demo@salescoach.ai',
+                role: 'rep'
+            };
+            this.updateUserProfile();
+        }
     }
 
     setupEventListeners() {
         console.log('Setting up event listeners...');
         
-        // Authentication form switching - Use more specific event handling
+        // Use addEventListener instead of onclick for better compatibility
         this.setupAuthenticationEvents();
         this.setupNavigationEvents();
         this.setupFrameworkEvents();
@@ -179,65 +191,109 @@ class SalesCoachApp {
     }
 
     setupAuthenticationEvents() {
+        console.log('Setting up authentication events...');
+        
+        // Skip Demo Button - PRIMARY path to app
+        const skipDemoBtn = document.getElementById('skip-demo-btn');
+        if (skipDemoBtn) {
+            // Remove any existing listeners
+            skipDemoBtn.replaceWith(skipDemoBtn.cloneNode(true));
+            const newSkipBtn = document.getElementById('skip-demo-btn');
+            
+            newSkipBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Skip demo button clicked!');
+                this.handleSkipDemo();
+            });
+            
+            // Also add double click for extra reliability
+            newSkipBtn.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Skip demo button double clicked!');
+                this.handleSkipDemo();
+            });
+            
+            console.log('Skip demo button event listeners added');
+        } else {
+            console.error('Skip demo button not found!');
+        }
+
+        // Fix input fields - ensure they can accept text
+        const inputs = ['login-email', 'login-password', 'signup-name', 'signup-email', 'signup-password'];
+        inputs.forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (input) {
+                input.removeAttribute('readonly');
+                input.removeAttribute('disabled');
+                input.style.pointerEvents = 'auto';
+                
+                // Add focus handlers to ensure inputs work
+                input.addEventListener('focus', () => {
+                    console.log(`Input ${inputId} focused`);
+                });
+                
+                input.addEventListener('input', (e) => {
+                    console.log(`Input ${inputId} value:`, e.target.value);
+                });
+            }
+        });
+
         // Form switching
         const showSignupBtn = document.getElementById('show-signup');
         const showLoginBtn = document.getElementById('show-login');
         
         if (showSignupBtn) {
-            showSignupBtn.onclick = (e) => {
+            showSignupBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 console.log('Switching to signup form');
                 this.showSignupForm();
-                return false;
-            };
+            });
         }
 
         if (showLoginBtn) {
-            showLoginBtn.onclick = (e) => {
+            showLoginBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 console.log('Switching to login form');
                 this.showLoginForm();
-                return false;
-            };
+            });
         }
 
-        // Authentication buttons - Use onclick for better compatibility
+        // Authentication buttons with proper event handling
         const loginBtn = document.getElementById('login-submit');
         const signupBtn = document.getElementById('signup-submit');
         const magicLinkBtn = document.getElementById('magic-link-btn');
         const signOutBtn = document.getElementById('sign-out-btn');
 
         if (loginBtn) {
-            loginBtn.onclick = (e) => {
+            loginBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 console.log('Login button clicked');
                 this.handleLogin();
-                return false;
-            };
+            });
         }
 
         if (signupBtn) {
-            signupBtn.onclick = (e) => {
+            signupBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 console.log('Signup button clicked');
                 this.handleSignup();
-                return false;
-            };
+            });
         }
 
         if (magicLinkBtn) {
-            magicLinkBtn.onclick = (e) => {
+            magicLinkBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 console.log('Magic link button clicked');
                 this.handleMagicLink();
-                return false;
-            };
+            });
         }
 
         if (signOutBtn) {
-            signOutBtn.onclick = () => {
+            signOutBtn.addEventListener('click', () => {
                 this.handleSignOut();
-            };
+            });
         }
 
         // Enter key support
@@ -245,147 +301,131 @@ class SalesCoachApp {
         const signupPassword = document.getElementById('signup-password');
         
         if (loginPassword) {
-            loginPassword.onkeydown = (e) => {
+            loginPassword.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     this.handleLogin();
                 }
-            };
+            });
         }
 
         if (signupPassword) {
-            signupPassword.onkeydown = (e) => {
+            signupPassword.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     this.handleSignup();
                 }
-            };
+            });
         }
 
-        // Fix input focus issues by ensuring inputs are properly focusable
-        const inputs = document.querySelectorAll('#auth-screen input, #auth-screen textarea, #auth-screen select');
-        inputs.forEach(input => {
-            input.onclick = () => {
-                input.focus();
-            };
-            // Ensure inputs are not readonly or disabled
-            input.removeAttribute('readonly');
-            input.removeAttribute('disabled');
-        });
+        console.log('Authentication events setup complete');
     }
 
     setupNavigationEvents() {
-        // Bottom navigation
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => {
-            item.onclick = () => {
+            item.addEventListener('click', () => {
                 const screen = item.getAttribute('data-screen');
                 console.log('Navigation to:', screen);
                 this.showScreen(screen);
                 this.setActiveNavItem(item);
-            };
+            });
         });
     }
 
     setupFrameworkEvents() {
-        // Framework search
         const searchInput = document.getElementById('framework-search');
         if (searchInput) {
-            searchInput.oninput = (e) => {
+            searchInput.addEventListener('input', (e) => {
                 this.searchFrameworks(e.target.value);
-            };
+            });
         }
 
-        // Create framework button
         const createBtn = document.getElementById('create-framework-btn');
         if (createBtn) {
-            createBtn.onclick = () => {
+            createBtn.addEventListener('click', () => {
                 this.showCustomFrameworkModal();
-            };
+            });
         }
     }
 
     setupSessionEvents() {
-        // Session controls
         const sessionBack = document.getElementById('session-back');
         if (sessionBack) {
-            sessionBack.onclick = () => {
+            sessionBack.addEventListener('click', () => {
                 this.endCurrentSession();
                 this.showScreen('frameworks');
-            };
+            });
         }
 
         const endSessionBtn = document.getElementById('end-session-btn');
         if (endSessionBtn) {
-            endSessionBtn.onclick = () => {
+            endSessionBtn.addEventListener('click', () => {
                 this.endSession();
-            };
+            });
         }
 
         const micButton = document.getElementById('mic-button');
         if (micButton) {
-            micButton.onclick = () => {
+            micButton.addEventListener('click', () => {
                 this.toggleRecording();
-            };
+            });
         }
 
-        // Coaching and step tracker toggles
         const coachingToggle = document.getElementById('coaching-toggle');
         if (coachingToggle) {
-            coachingToggle.onclick = () => {
+            coachingToggle.addEventListener('click', () => {
                 this.toggleCoachingDrawer();
-            };
+            });
         }
 
         const stepTrackerToggle = document.getElementById('step-tracker-toggle');
         if (stepTrackerToggle) {
-            stepTrackerToggle.onclick = () => {
+            stepTrackerToggle.addEventListener('click', () => {
                 this.toggleStepTracker();
-            };
+            });
         }
 
-        // Results actions
         const resultsBack = document.getElementById('results-back');
         if (resultsBack) {
-            resultsBack.onclick = () => {
+            resultsBack.addEventListener('click', () => {
                 this.showScreen('frameworks');
-            };
+            });
         }
 
         const newSessionBtn = document.getElementById('new-session-btn');
         if (newSessionBtn) {
-            newSessionBtn.onclick = () => {
+            newSessionBtn.addEventListener('click', () => {
                 this.showScreen('frameworks');
-            };
+            });
         }
 
         const shareResultsBtn = document.getElementById('share-results-btn');
         if (shareResultsBtn) {
-            shareResultsBtn.onclick = () => {
+            shareResultsBtn.addEventListener('click', () => {
                 this.shareResults();
-            };
+            });
         }
 
         const exportPdfBtn = document.getElementById('export-pdf-btn');
         if (exportPdfBtn) {
-            exportPdfBtn.onclick = () => {
+            exportPdfBtn.addEventListener('click', () => {
                 this.exportPDF();
-            };
+            });
         }
 
         const exportTranscriptBtn = document.getElementById('export-transcript');
         if (exportTranscriptBtn) {
-            exportTranscriptBtn.onclick = () => {
+            exportTranscriptBtn.addEventListener('click', () => {
                 this.exportTranscript();
-            };
+            });
         }
 
-        // Session list
         const viewAllSessionsBtn = document.getElementById('view-all-sessions');
         if (viewAllSessionsBtn) {
-            viewAllSessionsBtn.onclick = () => {
+            viewAllSessionsBtn.addEventListener('click', () => {
                 this.showScreen('sessions');
-            };
+            });
         }
     }
 
@@ -393,58 +433,88 @@ class SalesCoachApp {
         // Framework modal
         const frameworkModalClose = document.getElementById('framework-modal-close');
         if (frameworkModalClose) {
-            frameworkModalClose.onclick = () => this.hideModal('framework-modal');
+            frameworkModalClose.addEventListener('click', () => this.hideModal('framework-modal'));
         }
 
         const frameworkModalOverlay = document.getElementById('framework-modal-overlay');
         if (frameworkModalOverlay) {
-            frameworkModalOverlay.onclick = () => this.hideModal('framework-modal');
+            frameworkModalOverlay.addEventListener('click', () => this.hideModal('framework-modal'));
         }
 
         const frameworkModalCancel = document.getElementById('framework-modal-cancel');
         if (frameworkModalCancel) {
-            frameworkModalCancel.onclick = () => this.hideModal('framework-modal');
+            frameworkModalCancel.addEventListener('click', () => this.hideModal('framework-modal'));
         }
 
         const frameworkModalStart = document.getElementById('framework-modal-start');
         if (frameworkModalStart) {
-            frameworkModalStart.onclick = () => this.startSession();
+            frameworkModalStart.addEventListener('click', () => this.startSession());
         }
 
         // Custom framework modal
         const customFrameworkClose = document.getElementById('custom-framework-close');
         if (customFrameworkClose) {
-            customFrameworkClose.onclick = () => this.hideModal('custom-framework-modal');
+            customFrameworkClose.addEventListener('click', () => this.hideModal('custom-framework-modal'));
         }
 
         const customFrameworkOverlay = document.getElementById('custom-framework-overlay');
         if (customFrameworkOverlay) {
-            customFrameworkOverlay.onclick = () => this.hideModal('custom-framework-modal');
+            customFrameworkOverlay.addEventListener('click', () => this.hideModal('custom-framework-modal'));
         }
 
         const customFrameworkCancel = document.getElementById('custom-framework-cancel');
         if (customFrameworkCancel) {
-            customFrameworkCancel.onclick = () => this.hideModal('custom-framework-modal');
+            customFrameworkCancel.addEventListener('click', () => this.hideModal('custom-framework-modal'));
         }
 
         const customFrameworkSave = document.getElementById('custom-framework-save');
         if (customFrameworkSave) {
-            customFrameworkSave.onclick = () => this.saveCustomFramework();
+            customFrameworkSave.addEventListener('click', () => this.saveCustomFramework());
         }
 
         const addStepBtn = document.getElementById('add-step');
         if (addStepBtn) {
-            addStepBtn.onclick = () => this.addCustomStep();
+            addStepBtn.addEventListener('click', () => this.addCustomStep());
         }
     }
 
     setupSettingsEvents() {
         const voiceProviderSelect = document.getElementById('voice-provider');
         if (voiceProviderSelect) {
-            voiceProviderSelect.onchange = (e) => {
+            voiceProviderSelect.addEventListener('change', (e) => {
                 this.updateVoiceProvider(e.target.value);
-            };
+            });
         }
+    }
+
+    // Skip Demo functionality - Primary authentication bypass
+    handleSkipDemo() {
+        console.log('Handling skip demo... Starting immediate transition');
+        this.isSkipMode = true;
+        
+        const skipBtn = document.getElementById('skip-demo-btn');
+        if (skipBtn) {
+            skipBtn.innerHTML = `
+                <span class="btn-spinner">
+                    <svg class="spinner" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" opacity="0.25"/>
+                        <path d="M12,2 A10,10 0 0,1 22,12" stroke="currentColor" stroke-width="4" fill="none"/>
+                    </svg>
+                </span>
+                <span>Loading Demo...</span>
+            `;
+            skipBtn.disabled = true;
+        }
+
+        // Show immediate feedback
+        this.showAuthStatus('Loading Sales Coach AI demo...', 'success');
+        
+        // Immediate transition to app
+        setTimeout(() => {
+            console.log('Transitioning to main app...');
+            this.showMainApp();
+            this.showToast('Welcome to Sales Coach AI! 🎉', 'success');
+        }, 1000);
     }
 
     showSignupForm() {
@@ -479,6 +549,49 @@ class SalesCoachApp {
         }
     }
 
+    showAuthStatus(message, type = 'success') {
+        const authStatus = document.getElementById('auth-status');
+        const authStatusText = document.getElementById('auth-status-text');
+        
+        if (authStatus && authStatusText) {
+            authStatusText.textContent = message;
+            authStatus.classList.remove('hidden');
+            
+            if (type === 'success') {
+                authStatus.style.background = 'var(--color-bg-3)';
+                authStatus.style.borderColor = 'var(--color-success)';
+                authStatus.style.color = 'var(--color-success)';
+            }
+        }
+    }
+
+    hideAuthStatus() {
+        const authStatus = document.getElementById('auth-status');
+        if (authStatus) {
+            authStatus.classList.add('hidden');
+        }
+    }
+
+    setButtonLoading(buttonId, loading) {
+        const button = document.getElementById(buttonId);
+        if (!button) return;
+        
+        const btnText = button.querySelector('.btn-text');
+        const btnSpinner = button.querySelector('.btn-spinner');
+        
+        if (loading) {
+            button.classList.add('loading');
+            button.disabled = true;
+            if (btnText) btnText.style.opacity = '0';
+            if (btnSpinner) btnSpinner.classList.remove('hidden');
+        } else {
+            button.classList.remove('loading');
+            button.disabled = false;
+            if (btnText) btnText.style.opacity = '1';
+            if (btnSpinner) btnSpinner.classList.add('hidden');
+        }
+    }
+
     handleLogin() {
         console.log('Handling login...');
         
@@ -496,32 +609,37 @@ class SalesCoachApp {
 
         console.log('Login attempt with email:', email);
 
-        if (!email || !password) {
-            this.showToast('Please fill in all fields', 'error');
-            return;
+        // Show loading state immediately
+        this.setButtonLoading('login-submit', true);
+        this.showAuthStatus('Signing you in...', 'success');
+
+        // For demo - accept any email/password combination
+        if (email && password) {
+            setTimeout(() => {
+                this.currentUser = {
+                    id: 'user-' + Date.now(),
+                    name: this.extractNameFromEmail(email),
+                    email: email,
+                    role: 'rep'
+                };
+
+                console.log('Login successful, user:', this.currentUser);
+                this.showAuthStatus('Successfully signed in!', 'success');
+                
+                // Navigate to main app
+                setTimeout(() => {
+                    this.setButtonLoading('login-submit', false);
+                    this.hideAuthStatus();
+                    this.showMainApp();
+                    this.updateUserProfile();
+                }, 1500);
+            }, 1000);
+        } else {
+            // Handle validation errors
+            this.setButtonLoading('login-submit', false);
+            this.hideAuthStatus();
+            this.showToast('Please enter both email and password', 'error');
         }
-
-        if (!this.isValidEmail(email)) {
-            this.showToast('Please enter a valid email address', 'error');
-            return;
-        }
-
-        // Simulate successful authentication for demo
-        this.currentUser = {
-            id: 'user-' + Date.now(),
-            name: this.extractNameFromEmail(email),
-            email: email,
-            role: 'rep'
-        };
-
-        console.log('Login successful, user:', this.currentUser);
-        this.showToast('Welcome back!', 'success');
-        
-        // Ensure navigation happens
-        setTimeout(() => {
-            this.showMainApp();
-            this.updateUserProfile();
-        }, 1000);
     }
 
     handleSignup() {
@@ -545,37 +663,36 @@ class SalesCoachApp {
 
         console.log('Signup attempt with email:', email);
 
-        if (!name || !email || !password) {
-            this.showToast('Please fill in all fields', 'error');
-            return;
+        // Show loading state
+        this.setButtonLoading('signup-submit', true);
+        this.showAuthStatus('Creating your account...', 'success');
+
+        // For demo - accept any valid input
+        if (name && email && password) {
+            setTimeout(() => {
+                this.currentUser = {
+                    id: 'user-' + Date.now(),
+                    name: name,
+                    email: email,
+                    role: role
+                };
+
+                console.log('Signup successful, user:', this.currentUser);
+                this.showAuthStatus('You\'re successfully signed up!', 'success');
+                
+                // Navigate to main app
+                setTimeout(() => {
+                    this.setButtonLoading('signup-submit', false);
+                    this.hideAuthStatus();
+                    this.showMainApp();
+                    this.updateUserProfile();
+                }, 1500);
+            }, 1000);
+        } else {
+            this.setButtonLoading('signup-submit', false);
+            this.hideAuthStatus();
+            this.showToast('Please fill in all required fields', 'error');
         }
-
-        if (!this.isValidEmail(email)) {
-            this.showToast('Please enter a valid email address', 'error');
-            return;
-        }
-
-        if (password.length < 6) {
-            this.showToast('Password must be at least 6 characters', 'error');
-            return;
-        }
-
-        // Simulate account creation
-        this.currentUser = {
-            id: 'user-' + Date.now(),
-            name: name,
-            email: email,
-            role: role
-        };
-
-        console.log('Signup successful, user:', this.currentUser);
-        this.showToast('Account created successfully!', 'success');
-        
-        // Ensure navigation happens
-        setTimeout(() => {
-            this.showMainApp();
-            this.updateUserProfile();
-        }, 1000);
     }
 
     handleMagicLink() {
@@ -595,12 +712,7 @@ class SalesCoachApp {
             return;
         }
 
-        if (!this.isValidEmail(email)) {
-            this.showToast('Please enter a valid email address', 'error');
-            return;
-        }
-
-        this.showToast('Magic link sent to your email!', 'success');
+        this.showAuthStatus('Magic link sent to your email!', 'success');
         
         // For demo purposes, automatically log them in after 2 seconds
         setTimeout(() => {
@@ -610,8 +722,9 @@ class SalesCoachApp {
                 email: email,
                 role: 'rep'
             };
-            this.showToast('Magic link authentication successful!', 'success');
+            this.showAuthStatus('Magic link authentication successful!', 'success');
             setTimeout(() => {
+                this.hideAuthStatus();
                 this.showMainApp();
                 this.updateUserProfile();
             }, 1000);
@@ -621,6 +734,7 @@ class SalesCoachApp {
     handleSignOut() {
         this.currentUser = null;
         this.currentSession = null;
+        this.isSkipMode = false;
         
         // Clear forms
         const loginEmail = document.getElementById('login-email');
@@ -630,11 +744,6 @@ class SalesCoachApp {
         
         this.showAuthScreen();
         this.showToast('Signed out successfully', 'success');
-    }
-
-    isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
     }
 
     extractNameFromEmail(email) {
@@ -704,7 +813,6 @@ class SalesCoachApp {
     }
 
     setActiveNavigation(screenId) {
-        // Set active nav item based on screen
         const navItems = document.querySelectorAll('.nav-item');
         navItems.forEach(item => {
             item.classList.remove('active');
@@ -763,21 +871,20 @@ class SalesCoachApp {
             </div>
         `;
 
-        // Use onclick for better compatibility
         const startBtn = card.querySelector('.framework-start-btn');
         const infoBtn = card.querySelector('.framework-card-info');
         
-        startBtn.onclick = () => {
+        startBtn.addEventListener('click', () => {
             console.log('Starting session with framework:', framework.name);
             this.currentFramework = framework;
             this.showFrameworkModal(framework);
-        };
+        });
 
-        infoBtn.onclick = (e) => {
+        infoBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             console.log('Showing framework info:', framework.name);
             this.showFrameworkModal(framework);
-        };
+        });
 
         return card;
     }
@@ -849,9 +956,9 @@ class SalesCoachApp {
         
         const removeBtn = stepElement.querySelector('.remove-step');
         if (removeBtn) {
-            removeBtn.onclick = () => {
+            removeBtn.addEventListener('click', () => {
                 stepElement.remove();
-            };
+            });
         }
         
         stepsContainer.appendChild(stepElement);
@@ -973,7 +1080,6 @@ class SalesCoachApp {
     }
 
     expandDrawersInitially() {
-        // Auto-expand coaching drawer and step tracker for better UX
         const coachingContent = document.getElementById('coaching-content');
         const coachingToggle = document.getElementById('coaching-toggle');
         const stepTrackerContent = document.getElementById('step-tracker-content');
@@ -1596,10 +1702,10 @@ class SalesCoachApp {
             `;
             
             // Add click handler to view session results
-            sessionCard.onclick = () => {
+            sessionCard.addEventListener('click', () => {
                 // In a real app, this would load the specific session data
                 this.showToast('Session details would load here', 'info');
-            };
+            });
             
             container.appendChild(sessionCard);
         });

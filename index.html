@@ -40,6 +40,29 @@
                 <p class="auth-subtitle">Master your sales skills with AI-powered voice training</p>
             </div>
 
+            <!-- Skip Demo Button - Prominent placement -->
+            <div class="skip-demo-section">
+                <button class="btn btn--primary btn--full-width skip-demo-btn" id="skip-demo-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8.59,16.58L13.17,12L8.59,7.41L10,6L16,12L10,18L8.59,16.58Z"/>
+                    </svg>
+                    Skip Demo - Explore Now
+                </button>
+                <p class="skip-demo-text">Try the full Sales Coach AI experience immediately</p>
+            </div>
+
+            <div class="auth-divider">
+                <span>or create account</span>
+            </div>
+
+            <!-- Auth Status Message -->
+            <div id="auth-status" class="auth-status hidden">
+                <div class="auth-status-content">
+                    <div class="auth-status-spinner"></div>
+                    <span id="auth-status-text">Signing you in...</span>
+                </div>
+            </div>
+
             <!-- Login Form -->
             <div id="login-form" class="auth-form active">
                 <div class="form-group">
@@ -50,7 +73,15 @@
                     <label class="form-label" for="login-password">Password</label>
                     <input type="password" id="login-password" class="form-control" placeholder="Enter your password" required>
                 </div>
-                <button class="btn btn--primary btn--full-width" id="login-submit">Sign In</button>
+                <button class="btn btn--primary btn--full-width" id="login-submit">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-spinner hidden">
+                        <svg class="spinner" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" opacity="0.25"/>
+                            <path d="M12,2 A10,10 0 0,1 22,12" stroke="currentColor" stroke-width="4" fill="none"/>
+                        </svg>
+                    </span>
+                </button>
                 <div class="auth-divider">
                     <span>or</span>
                 </div>
@@ -83,7 +114,15 @@
                         <option value="admin">Administrator</option>
                     </select>
                 </div>
-                <button class="btn btn--primary btn--full-width" id="signup-submit">Create Account</button>
+                <button class="btn btn--primary btn--full-width" id="signup-submit">
+                    <span class="btn-text">Create Account</span>
+                    <span class="btn-spinner hidden">
+                        <svg class="spinner" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" opacity="0.25"/>
+                            <path d="M12,2 A10,10 0 0,1 22,12" stroke="currentColor" stroke-width="4" fill="none"/>
+                        </svg>
+                    </span>
+                </button>
                 <p class="auth-switch">
                     Already have an account? 
                     <a href="#" id="show-login">Sign in</a>
