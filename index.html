@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Coach AI - Voice Sales Training Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiU2FsZXMgQ29hY2ggQUkiLCJzaG9ydF9uYW1lIjoiU2FsZXNDb2FjaEFJIiwic3RhcnRfdXJsIjoiLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiNmOWZhZmIiLCJ0aGVtZV9jb2xvciI6IiM0RjQ2RTUiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M00zVXVZVzVuTHpJd01EQXZjM1puSWlCM2FXUjBhRDBpTVRJNElpQm9aV2xuYUhROU1USTRMQ0IyYVdWM1FtOTRQU0l3SURBZ01USTRJREUwTWlJK1BISmxZM1FnZUQwaU16WWlJSGs5SWpNMklpQjNhV1IwYUQwaU5UWWlJR2hsYVdkb2REMGlOVFlpSUhKNFBTSXhNaUlnWm1sc2JEMGlJelEwTnpVNE9pSXZQand2YzNablBnPT0iLCJzaXplcyI6IjEyOHgxMjgiLCJ0eXBlIjoiaW1hZ2Uvc3ZnK3htbCJ9XX0=">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="12" y="12" width="24" height="24" rx="4" fill="#4F46E5"/>
+                    <path d="M20 24L26 18L26 30L20 24Z" fill="white"/>
+                </svg>
+            </div>
+            <div class="loading-text">Sales Coach AI</div>
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Authentication Screen -->
+    <div id="auth-screen" class="screen active">
+        <div class="auth-container">
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="12" y="12" width="24" height="24" rx="4" fill="#4F46E5"/>
+                        <path d="M20 24L26 18L26 30L20 24Z" fill="white"/>
+                    </svg>
+                </div>
+                <h1 class="auth-title">Sales Coach AI</h1>
+                <p class="auth-subtitle">Master your sales skills with AI-powered voice training</p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="login-form" class="auth-form active">
+                <div class="form-group">
+                    <label class="form-label" for="login-email">Email</label>
+                    <input type="email" id="login-email" class="form-control" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="login-password">Password</label>
+                    <input type="password" id="login-password" class="form-control" placeholder="Enter your password" required>
+                </div>
+                <button class="btn btn--primary btn--full-width" id="login-submit">Sign In</button>
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+                <button class="btn btn--outline btn--full-width" id="magic-link-btn">Send Magic Link</button>
+                <p class="auth-switch">
+                    Don't have an account? 
+                    <a href="#" id="show-signup">Sign up</a>
+                </p>
+            </div>
+
+            <!-- Signup Form -->
+            <div id="signup-form" class="auth-form">
+                <div class="form-group">
+                    <label class="form-label" for="signup-name">Full Name</label>
+                    <input type="text" id="signup-name" class="form-control" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="signup-email">Email</label>
+                    <input type="email" id="signup-email" class="form-control" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="signup-password">Password</label>
+                    <input type="password" id="signup-password" class="form-control" placeholder="Create a password" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="signup-role">Role</label>
+                    <select id="signup-role" class="form-control">
+                        <option value="rep">Sales Representative</option>
+                        <option value="manager">Sales Manager</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+                <button class="btn btn--primary btn--full-width" id="signup-submit">Create Account</button>
+                <p class="auth-switch">
+                    Already have an account? 
+                    <a href="#" id="show-login">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div id="main-app" class="main-app">
+        <!-- Mobile Navigation -->
+        <nav class="mobile-nav">
+            <button class="nav-item" data-screen="frameworks">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM9 17H7V10H9V17ZM13 17H11V7H13V17ZM17 17H15V13H17V17Z"/>
+                </svg>
+                <span>Frameworks</span>
+            </button>
+            <button class="nav-item" data-screen="sessions">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2S9 3.34 9 5V11C9 12.66 10.34 14 12 14ZM17.3 11C17.3 14 14.76 16.1 12 16.1S6.7 14 6.7 11H5C5 14.41 7.72 17.23 11 17.72V21H13V17.72C16.28 17.23 19 14.41 19 11H17.3Z"/>
+                </svg>
+                <span>Sessions</span>
+            </button>
+            <button class="nav-item" data-screen="dashboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 13H11V3H3V13ZM3 21H11V15H3V21ZM13 21H21V11H13V21ZM13 3V9H21V3H13Z"/>
+                </svg>
+                <span>Dashboard</span>
+            </button>
+            <button class="nav-item" data-screen="settings">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.14,12.94C19.18,12.64,19.2,12.33,19.2,12C19.2,11.68,19.18,11.36,19.13,11.06L21.16,9.48C21.34,9.34,21.39,9.07,21.28,8.87L19.36,5.55C19.24,5.33,18.97,5.26,18.76,5.33L16.38,6.29C15.93,5.93,15.45,5.64,14.92,5.42L14.54,2.81C14.5,2.57,14.3,2.4,14.04,2.4H10.2C9.94,2.4,9.74,2.57,9.7,2.81L9.32,5.42C8.79,5.64,8.31,5.93,7.86,6.29L5.48,5.33C5.27,5.25,5,5.32,4.88,5.55L2.96,8.87C2.84,9.07,2.89,9.34,3.08,9.48L5.11,11.06C5.06,11.36,5.04,11.68,5.04,12C5.04,12.32,5.06,12.64,5.11,12.94L3.08,14.52C2.89,14.66,2.84,14.93,2.96,15.13L4.88,18.45C5,18.67,5.27,18.74,5.48,18.67L7.86,17.71C8.31,18.07,8.79,18.36,9.32,18.58L9.7,21.19C9.74,21.43,9.94,21.6,10.2,21.6H14.04C14.3,21.6,14.5,21.43,14.54,21.19L14.92,18.58C15.45,18.36,15.93,18.07,16.38,17.71L18.76,18.67C18.97,18.75,19.24,18.68,19.36,18.45L21.28,15.13C21.39,14.93,21.34,14.66,21.16,14.52L19.14,12.94ZM12.12,15.6C10.27,15.6,8.77,14.1,8.77,12.25S10.27,8.9,12.12,8.9S15.47,10.4,15.47,12.25S13.97,15.6,12.12,15.6Z"/>
+                </svg>
+                <span>Settings</span>
+            </button>
+        </nav>
+
+        <!-- Frameworks Screen -->
+        <div id="frameworks-screen" class="screen active">
+            <header class="screen-header">
+                <div class="header-content">
+                    <h1>Sales Frameworks</h1>
+                    <p>Choose a framework to begin your training session</p>
+                </div>
+                <div class="search-container">
+                    <input type="text" id="framework-search" class="search-input" placeholder="Search frameworks...">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.5 14H14.71L14.43 13.73C15.41 12.59 16 11.11 16 9.5C16 5.91 13.09 3 9.5 3S3 5.91 3 9.5S5.91 16 9.5 16C11.11 16 12.59 15.41 13.73 14.43L14 14.71V15.5L19 20.49L20.49 19L15.5 14ZM9.5 14C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5S14 7.01 14 9.5S11.99 14 9.5 14Z"/>
+                    </svg>
+                </div>
+            </header>
+
+            <main class="screen-content">
+                <div id="frameworks-grid" class="frameworks-grid"></div>
+                
+                <button class="btn btn--outline btn--full-width create-framework-btn" id="create-framework-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 13H13V19H11V13H5V11H11V5H13V11H19V13Z"/>
+                    </svg>
+                    Create Custom Framework
+                </button>
+            </main>
+        </div>
+
+        <!-- Live Session Screen -->
+        <div id="session-screen" class="screen">
+            <header class="session-header">
+                <div class="session-info">
+                    <button class="back-btn" id="session-back">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 11H7.83L13.42 5.41L12 4L4 12L12 20L13.41 18.59L7.83 13H20V11Z"/>
+                        </svg>
+                    </button>
+                    <div class="session-details">
+                        <h2 id="session-framework-name">Values-Based Sales Path</h2>
+                        <div class="session-timer" id="session-timer">00:00</div>
+                    </div>
+                </div>
+                <button class="btn btn--sm" id="end-session-btn">End Session</button>
+            </header>
+
+            <main class="session-content">
+                <!-- AI Avatar Section -->
+                <div class="ai-section">
+                    <div class="ai-avatar" id="ai-avatar">
+                        <div class="avatar-waveform">
+                            <div class="waveform-bar"></div>
+                            <div class="waveform-bar"></div>
+                            <div class="waveform-bar"></div>
+                            <div class="waveform-bar"></div>
+                            <div class="waveform-bar"></div>
+                        </div>
+                    </div>
+                    <div class="ai-status" id="ai-status">Ready to begin...</div>
+                </div>
+
+                <!-- Conversation Window -->
+                <div class="conversation-window">
+                    <div class="messages-container" id="messages-container">
+                        <div class="welcome-message">
+                            <div class="message ai-message">
+                                <div class="message-content">
+                                    Hello! I'm your AI prospect for today's training session. I'll be playing the role of a potential customer interested in your solutions. Ready to get started?
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voice Controls -->
+                <div class="voice-controls">
+                    <button class="mic-button" id="mic-button">
+                        <svg class="mic-icon" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 14C13.66 14 15 12.66 15 11V5C15 3.34 13.66 2 12 2S9 3.34 9 5V11C9 12.66 10.34 14 12 14ZM17.3 11C17.3 14 14.76 16.1 12 16.1S6.7 14 6.7 11H5C5 14.41 7.72 17.23 11 17.72V21H13V17.72C16.28 17.23 19 14.41 19 11H17.3Z"/>
+                        </svg>
+                        <div class="mic-pulse"></div>
+                    </button>
+                    <div class="voice-status" id="voice-status">Tap to speak</div>
+                </div>
+
+                <!-- Real-time Coaching Drawer -->
+                <div class="coaching-drawer" id="coaching-drawer">
+                    <div class="coaching-header">
+                        <h3>Live Coaching</h3>
+                        <button class="coaching-toggle" id="coaching-toggle">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="coaching-content" id="coaching-content">
+                        <div class="coaching-tips" id="coaching-tips"></div>
+                    </div>
+                </div>
+
+                <!-- Step Tracker -->
+                <div class="step-tracker" id="step-tracker">
+                    <div class="step-tracker-header">
+                        <h3>Progress</h3>
+                        <button class="step-tracker-toggle" id="step-tracker-toggle">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="step-tracker-content" id="step-tracker-content">
+                        <div class="steps-list" id="steps-list"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard-screen" class="screen">
+            <header class="screen-header">
+                <div class="header-content">
+                    <h1>Performance Dashboard</h1>
+                    <p>Track your progress and improvement areas</p>
+                </div>
+            </header>
+
+            <main class="screen-content">
+                <!-- Quick Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">87</div>
+                        <div class="stat-label">Avg Score</div>
+                        <div class="stat-change positive">+5%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">23</div>
+                        <div class="stat-label">Sessions</div>
+                        <div class="stat-change positive">+3</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">4.2h</div>
+                        <div class="stat-label">Practice Time</div>
+                        <div class="stat-change positive">+30m</div>
+                    </div>
+                </div>
+
+                <!-- Recent Sessions -->
+                <div class="card">
+                    <div class="card__body">
+                        <h3 class="section-title">Recent Sessions</h3>
+                        <div id="recent-sessions" class="sessions-list"></div>
+                        <button class="btn btn--outline btn--sm" id="view-all-sessions">View All Sessions</button>
+                    </div>
+                </div>
+
+                <!-- Skills Overview -->
+                <div class="card">
+                    <div class="card__body">
+                        <h3 class="section-title">Skills Overview</h3>
+                        <div class="skills-grid">
+                            <div class="skill-item">
+                                <div class="skill-name">Discovery Questions</div>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 88%"></div>
+                                </div>
+                                <div class="skill-score">88%</div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-name">Objection Handling</div>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 76%"></div>
+                                </div>
+                                <div class="skill-score">76%</div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-name">Value Demonstration</div>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 82%"></div>
+                                </div>
+                                <div class="skill-score">82%</div>
+                            </div>
+                            <div class="skill-item">
+                                <div class="skill-name">Closing Techniques</div>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 71%"></div>
+                                </div>
+                                <div class="skill-score">71%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Session Results Screen -->
+        <div id="results-screen" class="screen">
+            <header class="screen-header">
+                <div class="header-content">
+                    <button class="back-btn" id="results-back">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M20 11H7.83L13.42 5.41L12 4L4 12L12 20L13.41 18.59L7.83 13H20V11Z"/>
+                        </svg>
+                    </button>
+                    <div>
+                        <h1>Session Results</h1>
+                        <p id="results-framework">Values-Based Sales Path</p>
+                    </div>
+                </div>
+            </header>
+
+            <main class="screen-content">
+                <!-- Overall Score -->
+                <div class="score-section">
+                    <div class="score-gauge">
+                        <div class="gauge-container">
+                            <div class="gauge-circle" id="score-circle">
+                                <div class="gauge-fill" id="score-fill"></div>
+                                <div class="gauge-score" id="overall-score">87</div>
+                            </div>
+                        </div>
+                        <div class="score-level" id="score-level">Proficient</div>
+                    </div>
+                </div>
+
+                <!-- Step Breakdown -->
+                <div class="card">
+                    <div class="card__body">
+                        <h3 class="section-title">Step Breakdown</h3>
+                        <div id="step-breakdown" class="step-breakdown"></div>
+                    </div>
+                </div>
+
+                <!-- Strengths & Improvements -->
+                <div class="insights-grid">
+                    <div class="card">
+                        <div class="card__body">
+                            <h4 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="success-icon">
+                                    <path d="M9,20.42L2.79,14.21L5.62,11.38L9,14.77L18.88,4.88L21.71,7.71L9,20.42Z"/>
+                                </svg>
+                                Strengths
+                            </h4>
+                            <ul id="strengths-list" class="insights-list"></ul>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card__body">
+                            <h4 class="card-title">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="warning-icon">
+                                    <path d="M13,14H11V10H13M13,18H11V16H13M1,21H23L12,2L1,21Z"/>
+                                </svg>
+                                Areas to Improve
+                            </h4>
+                            <ul id="improvements-list" class="insights-list"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transcript Tab -->
+                <div class="card">
+                    <div class="card__body">
+                        <div class="tab-header">
+                            <h3 class="section-title">Conversation Transcript</h3>
+                            <button class="btn btn--outline btn--sm" id="export-transcript">Export</button>
+                        </div>
+                        <div id="transcript-content" class="transcript-content"></div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn--primary" id="new-session-btn">Start New Session</button>
+                    <button class="btn btn--outline" id="share-results-btn">Share Results</button>
+                    <button class="btn btn--outline" id="export-pdf-btn">Export PDF</button>
+                </div>
+            </main>
+        </div>
+
+        <!-- Sessions List Screen -->
+        <div id="sessions-screen" class="screen">
+            <header class="screen-header">
+                <div class="header-content">
+                    <h1>Training Sessions</h1>
+                    <p>Review your practice history</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn--outline btn--sm" id="filter-sessions">Filter</button>
+                </div>
+            </header>
+
+            <main class="screen-content">
+                <div id="sessions-list" class="sessions-history"></div>
+            </main>
+        </div>
+
+        <!-- Settings Screen -->
+        <div id="settings-screen" class="screen">
+            <header class="screen-header">
+                <div class="header-content">
+                    <h1>Settings</h1>
+                    <p>Manage your preferences and account</p>
+                </div>
+            </header>
+
+            <main class="screen-content">
+                <!-- Profile Section -->
+                <div class="card">
+                    <div class="card__body">
+                        <h3 class="section-title">Profile</h3>
+                        <div class="profile-info">
+                            <div class="profile-avatar">
+                                <div class="avatar-circle">
+                                    <span id="user-initials">JD</span>
+                                </div>
+                            </div>
+                            <div class="profile-details">
+                                <div class="profile-name" id="user-name">John Doe</div>
+                                <div class="profile-email" id="user-email">john.doe@company.com</div>
+                                <div class="profile-role" id="user-role">Sales Representative</div>
+                            </div>
+                        </div>
+                        <button class="btn btn--outline btn--sm">Edit Profile</button>
+                    </div>
+                </div>
+
+                <!-- Voice Settings -->
+                <div class="card">
+                    <div class="card__body">
+                        <h3 class="section-title">Voice Settings</h3>
+                        <div class="form-group">
+                            <label class="form-label" for="voice-provider">Voice Provider</label>
+                            <select id="voice-provider" class="form-control">
+                                <option value="openai-realtime">OpenAI Realtime</option>
+                                <option value="elevenlabs-whisper">ElevenLabs + Whisper</option>
+                                <option value="text-only">Text Only</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="ai-voice-style">AI Voice Style</label>
+                            <select id="ai-voice-style" class="form-control">
+                                <option value="professional">Professional</option>
+                                <option value="friendly">Friendly</option>
+                                <option value="challenging">Challenging</option>
+                            </select>
+                        </div>
+                        <div class="toggle-group">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="save-recordings" checked>
+                                <span class="toggle-slider"></span>
+                                Save session recordings
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coaching Preferences -->
+                <div class="card">
+                    <div class="card__body">
+                        <h3 class="section-title">Coaching Preferences</h3>
+                        <div class="toggle-group">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="real-time-coaching" checked>
+                                <span class="toggle-slider"></span>
+                                Real-time coaching tips
+                            </label>
+                        </div>
+                        <div class="toggle-group">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="step-tracking" checked>
+                                <span class="toggle-slider"></span>
+                                Framework step tracking
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="coaching-style">Coaching Intensity</label>
+                            <select id="coaching-style" class="form-control">
+                                <option value="gentle">Gentle</option>
+                                <option value="balanced">Balanced</option>
+                                <option value="intensive">Intensive</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data & Privacy -->
+                <div class="card">
+                    <div class="card__body">
+                        <h3 class="section-title">Data & Privacy</h3>
+                        <div class="settings-actions">
+                            <button class="btn btn--outline btn--full-width">Export My Data</button>
+                            <button class="btn btn--outline btn--full-width">Clear Session History</button>
+                            <button class="btn btn--outline btn--full-width text-error">Delete Account</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sign Out -->
+                <div class="card">
+                    <div class="card__body">
+                        <button class="btn btn--outline btn--full-width" id="sign-out-btn">Sign Out</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="framework-modal" class="modal hidden">
+        <div class="modal-overlay" id="framework-modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-framework-title">Framework Details</h3>
+                <button class="modal-close" id="framework-modal-close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-framework-description" class="framework-description"></div>
+                <div id="modal-framework-steps" class="framework-steps"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--outline" id="framework-modal-cancel">Cancel</button>
+                <button class="btn btn--primary" id="framework-modal-start">Start Session</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="custom-framework-modal" class="modal hidden">
+        <div class="modal-overlay" id="custom-framework-overlay"></div>
+        <div class="modal-content large">
+            <div class="modal-header">
+                <h3>Create Custom Framework</h3>
+                <button class="modal-close" id="custom-framework-close">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="custom-framework-form">
+                    <div class="form-group">
+                        <label class="form-label" for="framework-name">Framework Name</label>
+                        <input type="text" id="framework-name" class="form-control" placeholder="Enter framework name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="framework-desc">Description</label>
+                        <textarea id="framework-desc" class="form-control" rows="3" placeholder="Describe your framework" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Steps</label>
+                        <div id="custom-steps" class="custom-steps">
+                            <div class="custom-step">
+                                <input type="text" placeholder="Step title" class="form-control step-title" required>
+                                <textarea placeholder="Step description" class="form-control step-description" rows="2" required></textarea>
+                                <input type="number" placeholder="Weight (0-1)" class="form-control step-weight" min="0" max="1" step="0.1" value="0.2" required>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn--outline btn--sm" id="add-step">Add Step</button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn--outline" id="custom-framework-cancel">Cancel</button>
+                <button class="btn btn--primary" id="custom-framework-save">Save Framework</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
